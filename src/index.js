@@ -78,12 +78,19 @@ class Game extends React.Component {
     });
   }
 
-  jumpTo(step) {
+  // jumpTo(step) {
+  //   this.setState({
+  //     //update stepNumber to the move clicked on
+  //     stepNumber: step,
+  //     //x-player is next if step is even. eg move #1: 'X', xIsNext: False; move #2: 'O', xIsNext: True.
+  //     xIsNext: (step % 2) === 0,
+  //   })
+  // }
+
+  undoMove(step) {
     this.setState({
-      //update stepNumber to the move clicked on
       stepNumber: step,
-      //x-player is next if step is even. eg move #1: 'X', xIsNext: False; move #2: 'O', xIsNext: True.
-      xIsNext: (step % 2) === 0,
+      xIsNext: !this.state.xIsNext,
     })
   }
 
@@ -102,16 +109,22 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });
+    // const moves = history.map((step, move) => {
+    //   const desc = move ?
+    //     'Go to move #' + move :
+    //     'Go to game start';
+    //   return (
+    //     <li key={move}>
+    //       <button onClick={() => this.jumpTo(move)}>{desc}</button>
+    //     </li>
+    //   );
+    // });
+
+    let undoBtn;
+    let currentMove = this.state.stepNumber;
+    if (currentMove > 0) {
+      undoBtn = <button onClick={() => this.undoMove(currentMove-1)}>Undo</button>
+    }
 
     let status;
     if (winner) {
@@ -132,9 +145,9 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
           <div>
             <button onClick={(i) => this.resetBoard(i)}>Reset Game</button>
+            <div>{undoBtn}</div>
           </div>
         </div>
       </div>
