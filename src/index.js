@@ -13,7 +13,6 @@ function Square(props) {
 }
 
 //The Board is composed of 9 Square pieces
-//if xIsNext is true, mark to X, else O
 class Board extends React.Component {
   renderSquare(i) {
     return (
@@ -66,6 +65,7 @@ class Game extends React.Component {
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
+    //if xIsNext is true, mark to X, else O
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     //store history of moves
     this.setState({
@@ -84,6 +84,16 @@ class Game extends React.Component {
       stepNumber: step,
       //x-player is next if step is even. eg move #1: 'X', xIsNext: False; move #2: 'O', xIsNext: True.
       xIsNext: (step % 2) === 0,
+    })
+  }
+
+  resetBoard(i) {
+    this.setState({
+      history: [{
+        squares: Array(9).fill(null),
+      }],
+      stepNumber: 0,
+      xIsNext: true,
     })
   }
 
@@ -123,6 +133,9 @@ class Game extends React.Component {
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
+          <div>
+            <button onClick={(i) => this.resetBoard(i)}>Reset Game</button>
+          </div>
         </div>
       </div>
     );
