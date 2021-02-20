@@ -23,7 +23,7 @@ class Board extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="board">
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -53,6 +53,8 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       xIsNext: true,
+      xScore: 0,
+      oScore: 0,
     };
   }
 
@@ -78,6 +80,15 @@ class Game extends React.Component {
     });
   }
 
+  updateScore(winner) {
+    if (winner == 'X') {
+      this.setState({xScore: this.state.xScore + 1});
+    }
+    else {
+      this.setState({oScore: this.state.oScore + 1});
+    }
+  }
+
   // jumpTo(step) {
   //   this.setState({
   //     //update stepNumber to the move clicked on
@@ -94,7 +105,7 @@ class Game extends React.Component {
     })
   }
 
-  resetBoard(i) {
+  resetBoard() {
     this.setState({
       history: [{
         squares: Array(9).fill(null),
@@ -102,6 +113,11 @@ class Game extends React.Component {
       stepNumber: 0,
       xIsNext: true,
     })
+  }
+
+  newGame(winner) {
+    this.updateScore(winner);
+    this.resetBoard();
   }
 
   render() {
@@ -123,15 +139,18 @@ class Game extends React.Component {
     let undoBtn;
     let currentMove = this.state.stepNumber;
     if (currentMove > 0) {
-      undoBtn = <button onClick={() => this.undoMove(currentMove-1)}>Undo</button>
+      undoBtn = <button onClick={() => this.undoMove(currentMove-1)}>Undo</button>;
     }
 
     let status;
+    let newOrReset;
     if (winner) {
-      status = 'Winner: ' + winner;
+      status = <span className="winStatus">Winner: {winner}</span>;
+      newOrReset = <button onClick={() => this.newGame(winner)}>New Game</button>;
     }
     else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      newOrReset = <button onClick={() => this.resetBoard()}>Reset Game</button>;
     }
 
     return (
@@ -142,13 +161,21 @@ class Game extends React.Component {
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
           />
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <div>
-            <button onClick={(i) => this.resetBoard(i)}>Reset Game</button>
+          <div className="gameOptions">
+            <div>{newOrReset}</div>
             <div>{undoBtn}</div>
           </div>
+        </div>
+        <div className="game-info">
+          <div className="scoreboard">
+            <div>Player X:
+              <div>{this.state.xScore}</div>
+            </div>
+            <div>Player O:
+              <div>{this.state.oScore}</div>
+            </div>
+          </div>
+          <div>{status}</div>
         </div>
       </div>
     );
@@ -166,6 +193,8 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6],
   ];
+  //for each line (possible wins), check if the values of all 'X' or all 'O'.
+  //return 'X' or 'O' (the winner) else nothing
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
